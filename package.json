@@ -1,5 +1,5 @@
 {
-  "name": "ngtemplate-loader",
+  "name": "ngtemplate-loader-typescript",
   "version": "2.0.1",
   "description": "Include AngularJS templates in the Webpack bundle and preload the template cache.",
   "main": "index.js",
@@ -13,7 +13,8 @@
   "keywords": [
     "webpack",
     "angularjs",
-    "loader"
+    "loader",
+    "typescript"
   ],
   "author": "WearyMonkey",
   "licenses": [

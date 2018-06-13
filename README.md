@@ -8,13 +8,13 @@ or [raw-loader](https://github.com/webpack-contrib/raw-loader). This gives you t
 
 ## Install
 
-`npm install ngtemplate-loader --save-dev`
+`npm install ngtemplate-loader-typescript --save-dev`
 
 ## Usage
 
 [Documentation: Using loaders](http://webpack.github.io/docs/using-loaders.html)
 
-ngTemplate loader will export the path of the HTML file, so you can use require directly AngularJS with templateUrl parameters e.g. 
+ngTemplate loader will export the path of the HTML file, so you can use require directly AngularJS with templateUrl parameters e.g.
 
 ``` javascript
 var templateUrl = require('ngtemplate!html!./test.html');
@@ -30,7 +30,7 @@ app.directive('testDirective', function() {
 
 To remove the extra `require`, check out the [Baggage Example](#baggage-example) below.
 
-ngTemplate creates a JS module that initialises the $templateCache with the HTML under the file path e.g. 
+ngTemplate creates a JS module that initialises the $templateCache with the HTML under the file path e.g.
 
 ``` javascript
 require('!ngtemplate?relativeTo=/projects/test/app!html!file.html');
@@ -90,10 +90,10 @@ require('!ngtemplate?module=myTemplates&relativeTo=/projects/test/app!html!file.
 
 ### Parameter Interpolation
 
-`module`, `relativeTo` and `prefix` parameters are interpolated using 
+`module`, `relativeTo` and `prefix` parameters are interpolated using
 [Webpack's standard interpolation rules](https://github.com/webpack/loader-utils#interpolatename).
-Interpolation regular expressions can be passed using the extra parameters `moduleRegExp`, `relativeToRegExp` 
-and `prefixRegExp` which apply to single parameters, or `regExp` which will apply to all three parameters. 
+Interpolation regular expressions can be passed using the extra parameters `moduleRegExp`, `relativeToRegExp`
+and `prefixRegExp` which apply to single parameters, or `regExp` which will apply to all three parameters.
 
 
 ### Path Separators (Or using on Windows)
@@ -166,7 +166,7 @@ templates.keys().forEach(function(key) {
 
 ## Baggage Example
 
-ngTemplate loader works well with the [Baggage Loader](https://github.com/deepsweet/baggage-loader) to remove all those 
+ngTemplate loader works well with the [Baggage Loader](https://github.com/deepsweet/baggage-loader) to remove all those
 extra HTML and CSS requires. See an example of a directive and webpack.config.js below. Or take a look at more complete
 example in the examples/baggage folder.
 
@@ -189,9 +189,9 @@ and a webpack.config.js like:
 module.exports = {
   module: {
     preLoaders: [
-      { 
-        test: /\.js$/, 
-        loader: 'baggage?[file].html&[file].css' 
+      {
+        test: /\.js$/,
+        loader: 'baggage?[file].html&[file].css'
       }
     ],
     loaders: [
