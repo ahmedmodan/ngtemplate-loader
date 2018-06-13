@@ -8,7 +8,7 @@ or [raw-loader](https://github.com/webpack-contrib/raw-loader). This gives you t
 
 ## Install
 
-`npm install ngtemplate-loader-typescript --save-dev`
+`npm install ngtemplate-typescript-loader --save-dev`
 
 ## Usage
 

@@ -1,5 +1,5 @@
 {
-  "name": "ngtemplate-loader-typescript",
+  "name": "ngtemplate-typescript-loader",
   "version": "2.0.2",
   "description": "Include AngularJS templates in the Webpack bundle and preload the template cache.",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/WearyMonkey/ngtemplate-loader.git"
+    "url": "git://github.com/ahmedmodan/ngtemplate-loader.git"
   },
   "keywords": [
     "webpack",
