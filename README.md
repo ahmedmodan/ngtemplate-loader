@@ -66,7 +66,7 @@ module.exports = {
     loaders: [
       {
         test: /\.html$/,
-        loader: 'ngtemplate-typescript-loader,
+        loader: 'ngtemplate-typescript-loader',
         options: {
           relativeTo: '/src/'
         }
@@ -90,7 +90,7 @@ module.exports = {
     loaders: [
       {
         test: /\.html$/,
-        loader: 'ngtemplate-typescript-loader,
+        loader: 'ngtemplate-typescript-loader',
         options: {
           relativeTo: ['/src/', '/node_modules/'],
           exportAsEs6Default: true
@@ -179,7 +179,7 @@ module.exports = {
     loaders: [
       {
         test: /\.html$/,
-        loader: 'ngtemplate-typescript-loader,
+        loader: 'ngtemplate-typescript-loader',
         options: {
           relativeTo: '/app'
         }
