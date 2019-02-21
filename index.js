@@ -7,7 +7,7 @@ module.exports = function (content) {
 
     var options = loaderUtils.getOptions(this) || {};
     var ngModule = getAndInterpolateOption.call(this, 'module', 'ng'); // ng is the global angular module that does not need to explicitly required
-    var relativeTo = getAndInterpolateOption.call(this, 'relativeTo', '');
+    var relativeTo = getAndInterpolateOption.call(this, 'relativeTo', ['']);
     var prefix = getAndInterpolateOption.call(this, 'prefix', '');
     var requireAngular = !!options.requireAngular || false;
     var absolute = false;
@@ -17,31 +17,41 @@ module.exports = function (content) {
     var exportAsEs6Default = options.exportAsEs6Default;
     var exportAsDefault = options.exportAsDefault;
 
+    if (typeof relativeTo === 'string') {
+        relativeTo = [relativeTo];
+    }
+
     // if a unix path starts with // we treat is as an absolute path e.g. //Users/wearymonkey
     // if we're on windows, then we ignore the / prefix as windows absolute paths are unique anyway e.g. C:\Users\wearymonkey
-    if (relativeTo[0] === '/') {
-        if (path.sep === '\\') { // we're on windows
-            relativeTo = relativeTo.substring(1);
-        } else if (relativeTo[1] === '/') {
-            absolute = true;
-            relativeTo = relativeTo.substring(1);
+    relativeTo.forEach(function (_, i) {
+        if (relativeTo[i][0] === '/') {
+            if (path.sep === '\\') { // we're on windows
+                relativeTo[i] = relativeTo[i].substring(1);
+            } else if (relativeTo[i][1] === '/') {
+                absolute = true;
+                relativeTo[i] = relativeTo[i].substring(1);
+            }
         }
-    }
+    })
 
     // normalise the path separators
     if (path.sep !== pathSep) {
-        relativeTo = relativeTo.replace(pathSepRegex, pathSep);
+        relativeTo.forEach(function (relativePath, i) {
+            relativeTo[i] = relativePath.replace(pathSepRegex, pathSep);
+        })
         prefix = prefix.replace(pathSepRegex, pathSep);
         resource = resource.replace(pathSepRegex, pathSep)
     }
 
-    var relativeToIndex = resource.indexOf(relativeTo);
+    var firstMatchingPath = getRelativePathThatAppearsFirst(resource, relativeTo);
+    var relativeToIndex = firstMatchingPath.index;
+    var relativeToPath = firstMatchingPath.path;
     if (relativeToIndex === -1 || (absolute && relativeToIndex !== 0)) {
         throw new Error('The path for file doesn\'t contain relativeTo param');
     }
 
     // a custom join of prefix using the custom path sep
-    var filePath = [prefix, resource.slice(relativeToIndex + relativeTo.length)]
+    var filePath = [prefix, resource.slice(relativeToIndex + relativeToPath.length)]
         .filter(Boolean)
         .join(pathSep)
         .replace(new RegExp(escapeRegExp(pathSep) + '+', 'g'), pathSep);
@@ -69,13 +79,26 @@ module.exports = function (content) {
         exportsString + " path;";
 
     function getAndInterpolateOption(optionKey, def) {
-        return options[optionKey]
-            ? loaderUtils.interpolateName(this, options[optionKey], {
-                context: options.context,
-                content: content,
-                regExp: options[optionKey + 'RegExp'] || options['regExp']
-            })
-            : def
+        var optionToUse = def;
+        var customOptions = options[optionKey];
+        if (customOptions) {
+            if (Array.isArray(customOptions)) {
+                optionToUse = customOptions.map(function(customOption) {
+                    return loaderUtils.interpolateName(this, customOption, {
+                        text: options.context,
+                        content: content,
+                        regExp: options[optionKey + 'RegExp'] || options['regExp']
+                    })
+                }.bind(this))
+            } else {
+                optionToUse = loaderUtils.interpolateName(this, customOptions, {
+                    context: options.context,
+                    content: content,
+                    regExp: options[optionKey + 'RegExp'] || options['regExp']
+                })
+            }
+        }
+        return optionToUse;
     }
 
     function findQuote(content, backwards) {
@@ -93,4 +116,21 @@ module.exports = function (content) {
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
+
+    function getRelativePathThatAppearsFirst(currentResourcePath, relativePaths) {
+        var currentFirst = null;
+        for (var i = 0; i < relativePaths.length; i++) {
+            var currentRelativePath = relativePaths[i];
+            var indexWithinResource = currentResourcePath.indexOf(currentRelativePath);
+            if (indexWithinResource > -1) {
+                if (
+                    currentFirst === null ||
+                    indexWithinResource < currentFirst.index
+                ) {
+                    currentFirst = { path: currentRelativePath, index: indexWithinResource };
+                }
+            }
+        }
+        return currentFirst !== null ? currentFirst : { path: '', index: -1 };
+    };
 };

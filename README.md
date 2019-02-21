@@ -1,5 +1,7 @@
 # AngularJS Template loader for [webpack](http://webpack.github.io/)
 
+This is a fork of the ngtemplate-loader with a few quality of life updates.
+
 Includes your AngularJS templates into your webpack Javascript Bundle. Pre-loads the AngularJS template cache
 to remove initial load times of templates.
 
@@ -57,9 +59,50 @@ You can set the base path of your templates using `relativeTo` and `prefix` para
 to strip a matching prefix from the absolute path of the input html file. `prefix` is then appended to path.
 
 The prefix of the path up to and including the first `relativeTo` match is stripped, e.g.
+```javascript
+// webpack.config.js
+module.exports = {
+  module: {
+    loaders: [
+      {
+        test: /\.html$/,
+        loader: 'ngtemplate-typescript-loader,
+        options: {
+          relativeTo: '/src/'
+        }
+      }
+    ]
+  }
+};
+// file in which the html file is imported
+require('/test/src/test.html');
+// c.put('test.html', ...)
+```
+
+You can also set the relativeTo parameter to an array of strings and this allows you to strip paths for multiple possible parameters.
+The parameter to match eariliest in the path will be where the loader strips the path from:
+
 
 ``` javascript
-require('!ngtemplate?relativeTo=/src/!html!/test/src/test.html');
+// webpack.config.js
+module.exports = {
+  module: {
+    loaders: [
+      {
+        test: /\.html$/,
+        loader: 'ngtemplate-typescript-loader,
+        options: {
+          relativeTo: ['/src/', '/node_modules/'],
+          exportAsEs6Default: true
+        }
+      }
+    ]
+  }
+};
+// file in which the html file is imported
+import templateUrl from '../../node_modules/test/src/test.html';
+// c.put('test/src/test.html', ...)
+import templateUrl from './test/src/test.html'
 // c.put('test.html', ...)
 ```
 
@@ -130,22 +173,21 @@ require('!ngtemplate?requireAngular!html!file.html');
 
 ## Webpack Config
 
-It's recommended to adjust your `webpack.config` so `ngtemplate!html!` is applied automatically on all files ending with `.html`:
-
 ``` javascript
 module.exports = {
   module: {
     loaders: [
       {
         test: /\.html$/,
-        loader: 'ngtemplate?relativeTo=' + (path.resolve(__dirname, './app')) + '/!html'
+        loader: 'ngtemplate-typescript-loader,
+        options: {
+          relativeTo: '/app'
+        }
       }
     ]
   }
 };
 ```
-
-Then you only need to write: `require('file.html')`.
 
 ## Dynamic Requires
 
